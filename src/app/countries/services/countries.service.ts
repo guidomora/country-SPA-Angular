@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError, map, Observable, of } from 'rxjs';
+import { catchError, delay, map, Observable, of } from 'rxjs';
 import { Country } from '../interfaces/country';
 
 @Injectable({ providedIn: 'root' })
@@ -8,6 +8,16 @@ export class CountriesService {
 
 
     private apiUrl: string = 'https://restcountries.com/v3.1'
+
+    private getCountriesRequest(url:string): Observable<Country[]> {
+        // el get retorna algo de Country[]
+        return this.http.get<Country[]>(url)
+        // es un operador de rxjs (liberria incluida en angular)
+        .pipe(
+            catchError(() => of([])), // si hay un error retorna un obsevable vacio
+            // delay(2000) // simula una carga de 2 seg
+        )
+    }
 
     constructor(private http: HttpClient) { }
 
@@ -24,31 +34,16 @@ export class CountriesService {
 
     searchCapital(term: string): Observable<Country[]> {
         const url = `${this.apiUrl}/capital/${term}`
-        // el get retorna algo de Country[]
-        return this.http.get<Country[]>(url)
-        // es un operador de rxjs (liberria incluida en angular)
-        .pipe(
-            catchError(() => of([])) // si hay un error retorna un obsevable vacio
-        )
+        return this.getCountriesRequest(url)
     }
 
     searchCountry(term:string): Observable<Country[]> {
         const url = `${this.apiUrl}/name/${term}`
-        // el get retorna algo de Country[]
-        return this.http.get<Country[]>(url)
-        // es un operador de rxjs (liberria incluida en angular)
-        .pipe(
-            catchError(() => of([])) // si hay un error retorna un obsevable vacio
-        )
+        return this.getCountriesRequest(url)
     }
 
     searchRegion(region:string): Observable<Country[]> {
         const url = `${this.apiUrl}/region/${region}`
-        // el get retorna algo de Country[]
-        return this.http.get<Country[]>(url)
-        // es un operador de rxjs (liberria incluida en angular)
-        .pipe(
-            catchError(() => of([])) // si hay un error retorna un obsevable vacio
-        )
+        return this.getCountriesRequest(url)
     }
 }
